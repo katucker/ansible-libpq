@@ -1,0 +1,74 @@
+#!/usr/bin/env ansible-playbook
+---
+
+# Install the psycopg2 module to manipulate PostgreSQL.
+#- name: Install psycopg2 on Debian distributions.
+#  apt: pkg=psycopg2 state=present
+#  sudo: True
+#  when ansible_os_family == "Debian"
+  
+- name: Install psycopg2 on RedHat distributions.
+  yum: name=python-psycopg2 state=present
+  sudo: True
+  when: ansible_os_family == "RedHat"
+  
+# Fix a potential problem with the /etc/sudoers file.
+# that prevents running sudo as the postgres user.
+- name: Verify sudoers allows running as postgres
+  lineinfile: "dest=/etc/sudoers state=present regexp='^%wheel' line='%wheel ALL=(ALL) NOPASSWD: ALL'"
+  sudo: True
+
+- name: Create a user within the database environment.
+  postgresql_user:
+    name: "{{ ansible_ssh_user }}"
+  sudo: True
+  sudo_user: postgres
+  
+- name: Create the user default database.
+  postgresql_db:
+    name: "{{ ansible_ssh_user }}"
+    owner: "{{ ansible_ssh_user }}"
+  sudo: True
+  sudo_user: postgres  
+  notify: Reload PostgreSQL
+
+- name: Add apt repository for node.js on Debian.
+  apt_repository: repo=ppa:chris-lea/node.js state=present
+  sudo: True
+  when: ansible_os_family == "Debian"
+      
+- name: Install nodeJS on Debian.
+  apt: pkg=nodejs state=present
+  sudo: True
+  when: ansible_os_family == "Debian"
+      
+- name: Install bootstrap for EPEL repository on RedHat.
+  copy: 
+    src: bootstrap-epel.repo
+    dest: /etc/yum.repos.d/
+    owner: root
+    group: root
+    mode: 0644
+  sudo: True
+  when: ansible_os_family == "RedHat"
+
+- name: Install EPEL repository on RedHat.
+  yum: name=epel-release enablerepo=bootstrap-epel state=present
+  sudo: True
+  when: ansible_os_family == "RedHat"
+
+- name: Enable EPEL repository on RedHat.
+  ini_file: dest=/etc/yum.repos.d/epel.repo section=epel option=enabled value=1
+  sudo: True
+  when: ansible_os_family == "RedHat"
+
+- name: Install nodeJS on RedHat.
+  yum: name=npm state=present
+  sudo: True
+  when: ansible_os_family == "RedHat"
+  
+- name: Clone the node-libpq code.
+  git: repo={{ libpq_repo_url }} dest={{ dest_folder }} clone=yes update=yes version={{ libpq_repo_version | default(omit) }}
+      
+- name: Install the node-libpq module and its development dependencies.
+  npm: path={{ dest_folder }} production=no

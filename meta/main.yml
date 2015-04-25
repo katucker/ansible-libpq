@@ -1,0 +1,19 @@
+---
+# Having the libpq role depend on the galaxyprojectdotorg.postgresql role
+# (from Ansible Galaxy) ensures the desired version of PostgreSQL is installed
+# prior to the tasks for creating the database and user.
+# The galaxyprojectdotorg.postgresql role takes care of the complexity of installing
+# the desired PostgreSQL version on the db server, regardless of whether that server is
+# running a Debian or RedHat distribution OS.
+# This sets all connections to localhost (via either IPv4 or IPv6) to trusted connections,
+# to ensure the libpq module tests can run successfully.
+dependencies:
+- role: galaxyprojectdotorg.postgresql
+  sudo: True
+  postgresql_version: "{{ libpq_pg_version }}"
+  postgresql_pg_hba_local_postgres_user: True
+  postgresql_pg_hba_local_socket: True
+  postgresql_pg_hba_local_ipv4: False
+  postgresql_pg_hba_local_ipv6: False
+  postgresql_pg_hba_conf:
+    - host  all  all  localhost  trust
