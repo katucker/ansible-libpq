@@ -3,4 +3,6 @@
 
 libpq_repo_url: "https://github.com/brianc/node-libpq.git"
 
-dest_folder: "{{ ansible_env.HOME }}/node-libpq"
+libpq_dest_folder: "{{ ansible_env.HOME }}/node-libpq"
+
+libpq_production: True

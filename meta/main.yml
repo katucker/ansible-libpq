@@ -12,3 +12,4 @@
 dependencies:
 - role: postgresql
   postgresql_devel: True
+  sudo: True

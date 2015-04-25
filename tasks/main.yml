@@ -37,7 +37,7 @@
   when: ansible_os_family == "RedHat"
   
 - name: Clone the node-libpq code.
-  git: repo={{ libpq_repo_url }} dest={{ dest_folder }} clone=yes update=yes version={{ libpq_repo_version | default(omit) }}
+  git: repo={{ libpq_repo_url }} dest={{ libpq_dest_folder }} clone=yes update=yes version={{ libpq_repo_version | default(omit) }}
       
-- name: Install the node-libpq module and its development dependencies.
-  npm: path={{ dest_folder }} production=no
+- name: Install the node-libpq module.
+  npm: path={{ libpq_dest_folder }} production={{ libpq_production }}
