@@ -1,8 +1,6 @@
 ---
 # Defaults for the libpq role.
 
-libpq_pg_version: 9.4
-
 libpq_repo_url: "https://github.com/brianc/node-libpq.git"
 
 dest_folder: "{{ ansible_env.HOME }}/node-libpq"
