@@ -1,7 +1,7 @@
 #!/usr/bin/env ansible-playbook
 ---
 
-- name: Add apt repository for node.js on Debian.
+- name: Add apt repository for nodeJS on Debian.
   apt_repository: repo=ppa:chris-lea/node.js state=present
   sudo: True
   when: ansible_os_family == "Debian"
@@ -9,6 +9,14 @@
 - name: Install nodeJS on Debian.
   apt: pkg=nodejs state=present
   sudo: True
+  when: ansible_os_family == "Debian"
+  
+- name: Install packages needed for building node-libpq from source on Debian.
+  apt: pkg={{ item }} state=present
+  sudo: True
+  with_items:
+    - git
+    - g++
   when: ansible_os_family == "Debian"
       
 - name: Install bootstrap for EPEL repository on RedHat.
@@ -34,6 +42,14 @@
 - name: Install nodeJS on RedHat.
   yum: name=npm state=present
   sudo: True
+  when: ansible_os_family == "RedHat"
+  
+- name: Install packages needed for building node-libpq from source on RedHat.
+  yum: name={{ item }} state=present
+  sudo: True
+  with_items:
+    - git
+    - g++
   when: ansible_os_family == "RedHat"
   
 - name: Clone the node-libpq code.
